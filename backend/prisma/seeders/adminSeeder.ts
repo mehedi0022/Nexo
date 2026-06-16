@@ -1,6 +1,6 @@
-import { db } from "../../src/config/db";
-import { env } from "../../src/config/env";
-import { hashPassword } from "../../src/utils/hashPassword";
+import { db } from "../../src/config/db.js";
+import { env } from "../../src/config/env.js";
+import { hashPassword } from "../../src/utils/hashPassword.js";
 
 export const seedAdmin = async () => {
   const existing = await db.user.findUnique({
