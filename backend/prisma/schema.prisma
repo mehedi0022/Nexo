@@ -71,6 +71,7 @@ model User {
   // Relations — Auth
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 
   // Relations — Commerce
   addresses     Address[]
@@ -118,6 +119,22 @@ model PasswordResetToken {
   updatedAt DateTime @updatedAt
 
   @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("email_verification_tokens")
 }
 
 // ============================================================
