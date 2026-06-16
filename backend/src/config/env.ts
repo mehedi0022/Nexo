@@ -47,4 +47,7 @@ export const env = {
   smtpMailUser: process.env.SMTP_MAIL_USER!,
   smtpMailPass: process.env.SMTP_MAIL_PASS!,
   smtpMailFromName: process.env.SMTP_MAIL_FROM_NAME!,
+
+  redisHost: process.env.REDIS_HOST ?? "localhost",
+  redisPort: parsePort(process.env.REDIS_PORT, 6379),
 };

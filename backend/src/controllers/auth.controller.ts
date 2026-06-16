@@ -3,14 +3,6 @@ import { AppError } from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authService } from "../services/auth.service.js";
 
-const getAuthenticatedUserId = (userId?: string) => {
-  if (!userId) {
-    throw new AppError("Authentication required", 401);
-  }
-
-  return userId;
-};
-
 export const register = asyncHandler(async (req, res) => {
   const result = await authService.register(req.body);
   return ApiResponse.created(res, "User registered successfully", result);
@@ -32,15 +24,21 @@ export const logout = asyncHandler(async (req, res) => {
 });
 
 export const getMe = asyncHandler(async (req, res) => {
-  const user = await authService.getProfile(getAuthenticatedUserId(req.user?.id));
-  return ApiResponse.ok(res, "Current user profile retrieved successfully", user);
+  const user = await authService.getProfile(
+    requireAuthenticatedUser(req.user?.id),
+  );
+  return ApiResponse.ok(
+    res,
+    "Current user profile retrieved successfully",
+    user,
+  );
 });
 
 export const getProfile = getMe;
 
 export const updateProfile = asyncHandler(async (req, res) => {
   const user = await authService.updateProfile(
-    getAuthenticatedUserId(req.user?.id),
+    requireAuthenticatedUser(req.user?.id),
     req.body,
   );
   return ApiResponse.ok(res, "Profile updated successfully", user);
@@ -48,7 +46,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
 export const changePassword = asyncHandler(async (req, res) => {
   await authService.changePassword(
-    getAuthenticatedUserId(req.user?.id),
+    requireAuthenticatedUser(req.user?.id),
     req.body.currentPassword,
     req.body.newPassword,
   );
@@ -67,9 +65,12 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
 export const verifyEmail = asyncHandler(async (req, res) => {
   const token = req.body.token ?? req.query.token;
-  const user = await authService.verifyEmail(
-    typeof token === "string" ? token : undefined,
-  );
+
+  if (typeof token !== "string") {
+    throw new AppError("Verification token is required", 400);
+  }
+
+  const user = await authService.verifyEmail(token);
   return ApiResponse.ok(res, "Email verified successfully", user);
 });
 
@@ -79,7 +80,7 @@ export const resendVerificationEmail = asyncHandler(async (req, res) => {
 });
 
 export const deleteAccount = asyncHandler(async (req, res) => {
-  await authService.deleteAccount(getAuthenticatedUserId(req.user?.id));
+  await authService.deleteAccount(requireAuthenticatedUser(req.user?.id));
   return ApiResponse.ok(res, "Account deleted successfully");
 });
 

@@ -16,8 +16,8 @@ export const seedAdmin = async () => {
     data: {
       email: env.adminEmail,
       password: await hashPassword(env.adminPassword),
-      firstName: env.adminFirstName,
-      lastName: env.adminLastName,
+      firstName: env.adminFirstName || "Mehedi",
+      lastName: env.adminLastName || "Hassan",
       role: "SUPER_ADMIN",
       isVerified: true,
     },
