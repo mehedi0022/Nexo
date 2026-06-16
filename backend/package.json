@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Express API for the ecommerce backend",
+  "description": "Express API for the E-commerce backend",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon",
@@ -12,17 +12,20 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.3",
     "@types/nodemailer": "^8.0.1",
     "nodemon": "^3.1.14",
+    "prisma": "^7.8.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -31,5 +34,8 @@
     "helmet": "^8.2.0",
     "nodemailer": "^9.0.0",
     "slugify": "^1.6.9"
+  },
+  "overrides": {
+    "@hono/node-server": "1.19.13"
   }
 }

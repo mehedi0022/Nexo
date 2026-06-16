@@ -1,3 +1,25 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+const requiredEnvVars = [
+  "SMTP_MAIL_HOST",
+  "SMTP_MAIL_PORT",
+  "SMTP_MAIL_USER",
+  "SMTP_MAIL_PASS",
+  "SMTP_MAIL_FROM_NAME",
+  "DATABASE_URL",
+  "ADMIN_EMAIL",
+  "ADMIN_PASSWORD",
+  "ADMIN_FIRST_NAME",
+  "ADMIN_LAST_NAME",
+];
+
+for (const varName of requiredEnvVars) {
+  if (!process.env[varName]) {
+    throw new Error(`Environment variable ${varName} is required but not set.`);
+  }
+}
+
 const parsePort = (value: string | undefined, fallback: number) => {
   const port = Number(value);
 
@@ -7,7 +29,13 @@ const parsePort = (value: string | undefined, fallback: number) => {
 export const env = {
   port: parsePort(process.env.PORT, 5000),
   nodeEnv: process.env.NODE_ENV ?? "development",
-  clientOrigin: process.env.CLIENT_ORIGIN ?? "*",
+  clientOrigin: process.env.CLIENT_ORIGIN ?? "http://localhost:3000",
+  databaseUrl: process.env.DATABASE_URL!,
+
+  adminEmail: process.env.ADMIN_EMAIL!,
+  adminPassword: process.env.ADMIN_PASSWORD!,
+  adminFirstName: process.env.ADMIN_FIRST_NAME!,
+  adminLastName: process.env.ADMIN_LAST_NAME!,
 
   smtpMailHost: process.env.SMTP_MAIL_HOST!,
   smtpMailPort: parsePort(process.env.SMTP_MAIL_PORT, 587),

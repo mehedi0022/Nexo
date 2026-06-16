@@ -1,11 +1,10 @@
-import cors from "cors";
 import type { Express } from "express";
+import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-
-import { env } from "../config/env";
-import { errorHandler, notFoundHandler } from "./errorHandler";
+import { errorHandler, notFoundHandler } from "./errorHandler.js";
+import { corsOptions } from "../config/cors.js";
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -15,8 +14,8 @@ const apiLimiter = rateLimit({
 });
 
 export const registerMiddlewares = (app: Express) => {
+  app.use(cors(corsOptions));
   app.use(helmet());
-  app.use(cors({ origin: env.clientOrigin }));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(apiLimiter);

@@ -1,5 +1,5 @@
 import nodemailer, { Transporter } from "nodemailer";
-import { env } from "./env";
+import { env } from "./env.js";
 
 class EmailTransporter {
   private static instance: Transporter;

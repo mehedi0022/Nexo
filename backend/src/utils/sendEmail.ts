@@ -1,6 +1,6 @@
-import { transporter } from "../config/nodemailer";
-import { verifyEmailTemplate } from "../templates/emails/verifyEmail";
-import { orderConfirmationTemplate } from "../templates/emails/orderConfirmation";
+import { transporter } from "../config/nodemailer.js";
+import { verifyEmailTemplate } from "../templates/emails/verifyEmail.js";
+import { orderConfirmationTemplate } from "../templates/emails/orderConfirmation.js";
 
 export const sendVerificationEmail = async (
   to: string,

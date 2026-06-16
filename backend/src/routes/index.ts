@@ -1,13 +1,13 @@
 import type { Express } from "express";
 
-import authRoutes from "./auth.routes";
-import productRoutes from "./product.routes";
-import categoryRoutes from "./category.routes";
-import orderRoutes from "./order.routes";
-import paymentRoutes from "./payment.routes";
-import userRoutes from "./user.routes";
-import reviewRoutes from "./review.routes";
-import dashboardRoutes from "./dashboard.routes";
+import authRoutes from "./auth.routes.js";
+import productRoutes from "./product.routes.js";
+import categoryRoutes from "./category.routes.js";
+import orderRoutes from "./order.routes.js";
+import paymentRoutes from "./payment.routes.js";
+import userRoutes from "./user.routes.js";
+import reviewRoutes from "./review.routes.js";
+import dashboardRoutes from "./dashboard.routes.js";
 
 export const registerRoutes = (app: Express) => {
   // Health check
