@@ -69,8 +69,8 @@ model User {
   isBanned   Boolean @default(false)
 
   // Relations — Auth
-  refreshTokens       RefreshToken[]
-  passwordResetTokens PasswordResetToken[]
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
 
   // Relations — Commerce
@@ -91,7 +91,7 @@ model User {
 model RefreshToken {
   id        String   @id @default(uuid())
   userId    String
-  token     String   @unique
+  token     String   @db.Text()
   revoked   Boolean  @default(false)
   expiresAt DateTime
 

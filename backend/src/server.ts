@@ -1,4 +1,3 @@
-import app from "./app.js";
 import { env } from "./config/env.js";
 import { db } from "./config/db.js";
 import { verifyMailConnection } from "./config/nodemailer.js";
@@ -6,9 +5,11 @@ import { connectRedis, disconnectRedis } from "./config/redis.js";
 
 const startServer = async () => {
   try {
+    await connectRedis();
+    const { default: app } = await import("./app.js");
+
     await db.$connect();
     console.log("✅ Database connected");
-    await connectRedis();
     await verifyMailConnection().catch((error) => {
       console.warn("⚠️ Mail server unavailable:", error.message);
       console.warn("⚠️ Emails will not be sent until mail is restored");

@@ -1,6 +1,16 @@
+import { env } from "../config/env.js";
 import { transporter } from "../config/nodemailer.js";
 import { verifyEmailTemplate } from "../templates/emails/verifyEmail.js";
 import { orderConfirmationTemplate } from "../templates/emails/orderConfirmation.js";
+
+export const sendEmail = async (to: string, subject: string, html: string) => {
+  await transporter.sendMail({
+    from: `${env.smtpMailFromName} <${env.smtpMailUser}>`,
+    to,
+    subject,
+    html,
+  });
+};
 
 export const sendVerificationEmail = async (
   to: string,
@@ -8,7 +18,7 @@ export const sendVerificationEmail = async (
   otp: string,
 ) => {
   await transporter.sendMail({
-    from: `"Your Shop" <${process.env.MAIL_USER}>`,
+    from: `${env.smtpMailFromName} <${env.smtpMailUser}>`,
     to,
     subject: "Verify Your Email",
     html: verifyEmailTemplate(otp, name),
@@ -23,7 +33,7 @@ export const sendOrderConfirmationEmail = async (
   total: number,
 ) => {
   await transporter.sendMail({
-    from: `"Your Shop" <${process.env.MAIL_USER}>`,
+    from: `${env.smtpMailFromName} <${env.smtpMailUser}>`,
     to,
     subject: `Order Confirmed - #${orderNumber}`,
     html: orderConfirmationTemplate(name, orderNumber, items, total),

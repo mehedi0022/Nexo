@@ -1,7 +1,5 @@
 import { Response } from "express";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface Meta {
   page?: number;
   limit?: number;
@@ -18,8 +16,6 @@ interface ApiResponsePayload<T> {
   error?: string | Record<string, unknown>;
   meta?: Meta;
 }
-
-// ─── Core Builder ─────────────────────────────────────────────────────────────
 
 function buildResponse<T>(
   success: boolean,
@@ -38,10 +34,7 @@ function buildResponse<T>(
   return payload;
 }
 
-// ─── ApiResponse Class ────────────────────────────────────────────────────────
-
 export class ApiResponse {
-  // 2xx — Success
   static ok<T>(res: Response, message: string, data?: T, meta?: Meta) {
     return res
       .status(200)
@@ -56,7 +49,6 @@ export class ApiResponse {
     return res.status(204).send();
   }
 
-  // 4xx — Client Errors
   static badRequest(
     res: Response,
     message = "Bad Request",
@@ -111,14 +103,12 @@ export class ApiResponse {
       .json(buildResponse(false, 429, message, undefined, message));
   }
 
-  // 5xx — Server Errors
   static internal(res: Response, message = "Internal Server Error") {
     return res
       .status(500)
       .json(buildResponse(false, 500, message, undefined, message));
   }
 
-  // Generic — for dynamic status codes
   static send<T>(
     res: Response,
     statusCode: number,

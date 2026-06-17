@@ -5,15 +5,8 @@ import {
   forgotPassword,
   resetPassword,
 } from "./password.service.js";
-import {
-  deleteAccount,
-  getProfile,
-  updateProfile,
-} from "./profile.service.js";
-import {
-  resendVerificationEmail,
-  verifyEmail,
-} from "./emailVerification.service.js";
+import { deleteAccount, getProfile, updateProfile } from "./profile.service.js";
+import { verifyEmail } from "./verifyEmail.service.js";
 
 export const authService = {
   register,
@@ -26,6 +19,5 @@ export const authService = {
   forgotPassword,
   resetPassword,
   verifyEmail,
-  resendVerificationEmail,
   deleteAccount,
 };

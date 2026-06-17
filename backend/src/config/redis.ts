@@ -40,15 +40,41 @@ class RedisClient {
   }
 
   static async connect(): Promise<void> {
-    try {
-      await RedisClient.getInstance().connect();
-    } catch (error) {
-      console.error("❌ Redis connection failed:", error);
+    const client = RedisClient.getInstance();
+
+    if (client.status === "ready") {
+      return;
     }
+
+    if (client.status !== "wait" && client.status !== "end") {
+      await new Promise<void>((resolve, reject) => {
+        const handleReady = () => {
+          client.off("error", handleError);
+          resolve();
+        };
+
+        const handleError = (error: Error) => {
+          client.off("ready", handleReady);
+          reject(error);
+        };
+
+        client.once("ready", handleReady);
+        client.once("error", handleError);
+      });
+      return;
+    }
+
+    await client.connect();
   }
 
   static async disconnect(): Promise<void> {
-    await RedisClient.getInstance().quit();
+    const client = RedisClient.getInstance();
+
+    if (client.status === "end") {
+      return;
+    }
+
+    await client.quit();
     console.log("Redis disconnected");
   }
 }

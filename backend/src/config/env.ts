@@ -12,8 +12,8 @@ const requiredEnvVars = [
   "ADMIN_PASSWORD",
   "ADMIN_FIRST_NAME",
   "ADMIN_LAST_NAME",
-  "JWT_SECRET",
-  "JWT_EXPIRES_IN",
+  "ACCESS_TOKEN_SECRET",
+  "REFRESH_TOKEN_SECRET",
 ];
 
 for (const varName of requiredEnvVars) {
@@ -39,8 +39,8 @@ export const env = {
   adminFirstName: process.env.ADMIN_FIRST_NAME!,
   adminLastName: process.env.ADMIN_LAST_NAME!,
 
-  jwtSecret: process.env.JWT_SECRET!,
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "15m",
+  accessTokenSecret: process.env.ACCESS_TOKEN_SECRET!,
+  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET!,
 
   smtpMailHost: process.env.SMTP_MAIL_HOST!,
   smtpMailPort: parsePort(process.env.SMTP_MAIL_PORT, 587),

@@ -1,16 +1,55 @@
 import { ApiResponse } from "../utils/apiResponse.js";
 import { AppError } from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { authService } from "../services/auth.service.js";
+import { authService } from "../services/auth/index.js";
+import { env } from "../config/env.js";
+import type { CookieOptions } from "express";
+
+const cookieOptions = (maxAge: number): CookieOptions => ({
+  httpOnly: true,
+  secure: env.nodeEnv === "production",
+  sameSite: env.nodeEnv === "production" ? "none" : "lax",
+  maxAge,
+});
+
+const ACCESS_TOKEN_AGE = 15 * 60 * 1000;
+const REFRESH_TOKEN_AGE = (isRememberMe: boolean) =>
+  isRememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+
+const setAuthCookies = (
+  res: any,
+  accessToken: string,
+  refreshToken: string,
+  isRememberMe: boolean = false,
+) => {
+  res.cookie("accessToken", accessToken, cookieOptions(ACCESS_TOKEN_AGE));
+  res.cookie(
+    "refreshToken",
+    refreshToken,
+    cookieOptions(REFRESH_TOKEN_AGE(isRememberMe)),
+  );
+};
 
 export const register = asyncHandler(async (req, res) => {
   const result = await authService.register(req.body);
   return ApiResponse.created(res, "User registered successfully", result);
 });
 
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const result = await authService.verifyEmail(req.body);
+  setAuthCookies(res, result.accessToken, result.refreshToken);
+
+  return ApiResponse.ok(res, "Email verified successfully", {
+    user: result.user,
+    accessToken: result.accessToken,
+  });
+});
+
 export const login = asyncHandler(async (req, res) => {
+  const { rememberMe } = req.body;
   const result = await authService.login(req.body);
-  return ApiResponse.ok(res, "User logged in successfully", result);
+  setAuthCookies(res, result.accessToken, result.refreshToken, rememberMe);
+  return ApiResponse.ok(res, "User logged in successfully");
 });
 
 export const refreshToken = asyncHandler(async (req, res) => {
@@ -20,13 +59,13 @@ export const refreshToken = asyncHandler(async (req, res) => {
 
 export const logout = asyncHandler(async (req, res) => {
   await authService.logout(req.body.refreshToken);
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
   return ApiResponse.ok(res, "User logged out successfully");
 });
 
 export const getMe = asyncHandler(async (req, res) => {
-  const user = await authService.getProfile(
-    requireAuthenticatedUser(req.user?.id),
-  );
+  const user = await authService.getProfile(req.user?.id!);
   return ApiResponse.ok(
     res,
     "Current user profile retrieved successfully",
@@ -37,16 +76,13 @@ export const getMe = asyncHandler(async (req, res) => {
 export const getProfile = getMe;
 
 export const updateProfile = asyncHandler(async (req, res) => {
-  const user = await authService.updateProfile(
-    requireAuthenticatedUser(req.user?.id),
-    req.body,
-  );
+  const user = await authService.updateProfile(req.user?.id!, req.body);
   return ApiResponse.ok(res, "Profile updated successfully", user);
 });
 
 export const changePassword = asyncHandler(async (req, res) => {
   await authService.changePassword(
-    requireAuthenticatedUser(req.user?.id),
+    req.user?.id!,
     req.body.currentPassword,
     req.body.newPassword,
   );
@@ -61,27 +97,6 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 export const resetPassword = asyncHandler(async (req, res) => {
   await authService.resetPassword(req.body.token, req.body.password);
   return ApiResponse.ok(res, "Password reset successfully");
-});
-
-export const verifyEmail = asyncHandler(async (req, res) => {
-  const token = req.body.token ?? req.query.token;
-
-  if (typeof token !== "string") {
-    throw new AppError("Verification token is required", 400);
-  }
-
-  const user = await authService.verifyEmail(token);
-  return ApiResponse.ok(res, "Email verified successfully", user);
-});
-
-export const resendVerificationEmail = asyncHandler(async (req, res) => {
-  await authService.resendVerificationEmail(req.body.email);
-  return ApiResponse.ok(res, "Verification email resent");
-});
-
-export const deleteAccount = asyncHandler(async (req, res) => {
-  await authService.deleteAccount(requireAuthenticatedUser(req.user?.id));
-  return ApiResponse.ok(res, "Account deleted successfully");
 });
 
 export const twoFactorAuth = asyncHandler(async () => {

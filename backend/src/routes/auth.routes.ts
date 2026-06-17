@@ -28,13 +28,28 @@ import {
   resendVerificationEmailSchema,
   resetPasswordSchema,
   updateProfileSchema,
-  verifyEmailQuerySchema,
+  verifyEmailSchema,
 } from "../validators/auth.validation.js";
+import {
+  forgotPasswordLimiter,
+  loginLimiter,
+  registerLimiter,
+} from "../config/rateLimiter.js";
 
 const router: Router = Router();
 
-router.post("/register", validateRequest({ body: registerSchema }), register);
-router.post("/login", validateRequest({ body: loginSchema }), login);
+router.post(
+  "/register",
+  registerLimiter,
+  validateRequest({ body: registerSchema }),
+  register,
+);
+router.post(
+  "/login",
+  loginLimiter,
+  validateRequest({ body: loginSchema }),
+  login,
+);
 router.post(
   "/refresh-token",
   validateRequest({ body: refreshTokenSchema }),
@@ -42,6 +57,7 @@ router.post(
 );
 router.post(
   "/forgot-password",
+  forgotPasswordLimiter,
   validateRequest({ body: forgotPasswordSchema }),
   forgotPassword,
 );
@@ -50,14 +66,10 @@ router.post(
   validateRequest({ body: resetPasswordSchema }),
   resetPassword,
 );
+
 router.post(
-  "/resend-verification-email",
-  validateRequest({ body: resendVerificationEmailSchema }),
-  resendVerificationEmail,
-);
-router.get(
   "/verify-email",
-  validateRequest({ query: verifyEmailQuerySchema }),
+  validateRequest({ body: verifyEmailSchema }),
   verifyEmail,
 );
 
@@ -80,7 +92,5 @@ router.post(
   validateRequest({ body: updateProfileSchema }),
   updateProfile,
 );
-router.delete("/delete-account", deleteAccount);
-router.post("/two-factor-auth", twoFactorAuth);
 
 export default router;

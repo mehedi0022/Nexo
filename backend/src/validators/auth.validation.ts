@@ -11,12 +11,17 @@ export const registerSchema = yup.object({
   lastName: name,
   email,
   password,
-  phone: yup.string().trim().max(15).optional(),
+  phone: yup
+    .string()
+    .trim()
+    .matches(/^(\+8801|8801|01)[3-9]\d{8}$/, "Invalid Bangladeshi phone number")
+    .optional(),
 });
 
 export const loginSchema = yup.object({
   email,
-  password: yup.string().trim().required(),
+  password,
+  rememberMe: yup.boolean().required(),
 });
 
 export const refreshTokenSchema = yup.object({
@@ -36,8 +41,9 @@ export const resetPasswordSchema = yup.object({
   password,
 });
 
-export const verifyEmailQuerySchema = yup.object({
-  token,
+export const verifyEmailSchema = yup.object({
+  email,
+  otp: yup.string().trim().required(),
 });
 
 export const verifyEmailBodySchema = yup.object({

@@ -5,7 +5,6 @@ import { AppError } from "../../utils/appError.js";
 import { comparePassword, hashPassword } from "../../utils/hashPassword.js";
 import {
   addMinutes,
-  createToken,
   hashToken,
   PASSWORD_RESET_EXPIRES_IN_MINUTES,
 } from "./common.js";
