@@ -2,7 +2,6 @@ import { Router } from "express";
 
 import {
   changePassword,
-  deleteAccount,
   forgotPassword,
   getMe,
   getProfile,
@@ -10,7 +9,6 @@ import {
   logout,
   refreshToken,
   register,
-  resendVerificationEmail,
   resetPassword,
   twoFactorAuth,
   updateProfile,
@@ -25,7 +23,6 @@ import {
   optionalRefreshTokenSchema,
   refreshTokenSchema,
   registerSchema,
-  resendVerificationEmailSchema,
   resetPasswordSchema,
   updateProfileSchema,
   verifyEmailSchema,

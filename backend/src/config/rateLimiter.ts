@@ -19,13 +19,13 @@ const createLimiter = (windowMs: number, max: number, message: string) =>
 
 export const globalLimiter = createLimiter(
   15 * 60 * 1000,
-  100,
+  1000,
   "Too many requests, please try again later",
 );
 
 export const loginLimiter = createLimiter(
   15 * 60 * 1000,
-  5,
+  1500,
   "Too many login attempts, please try again after 15 minutes",
 );
 

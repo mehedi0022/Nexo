@@ -2,6 +2,7 @@ import { db } from "../../config/db.js";
 import { AppError } from "../../utils/appError.js";
 import { comparePassword } from "../../utils/hashPassword.js";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt.js";
+import { hashToken } from "./common.js";
 
 export interface LoginInput {
   email: string;
@@ -31,6 +32,15 @@ export const login = async (input: LoginInput) => {
     },
     input.rememberMe === true ? 604800 : 86400,
   );
+  const refreshTokenTtl = input.rememberMe === true ? 604800 : 86400;
+
+  await db.refreshToken.create({
+    data: {
+      userId: user.id,
+      token: hashToken(refreshToken),
+      expiresAt: new Date(Date.now() + refreshTokenTtl * 1000),
+    },
+  });
 
   return {
     accessToken,
@@ -39,7 +49,7 @@ export const login = async (input: LoginInput) => {
 };
 
 export const refresh = async (refreshToken: string) => {
-  const storedToken = await db.refreshToken.findUnique({
+  const storedToken = await db.refreshToken.findFirst({
     where: { token: hashToken(refreshToken) },
     include: { user: true },
   });
@@ -68,7 +78,7 @@ export const logout = async (refreshToken?: string) => {
   if (!refreshToken) return;
 
   await db.refreshToken.updateMany({
-    where: { token: refreshToken, revoked: false },
+    where: { token: hashToken(refreshToken), revoked: false },
     data: { revoked: true },
   });
 };

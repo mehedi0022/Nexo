@@ -10,7 +10,15 @@ const cookieOptions = (maxAge: number): CookieOptions => ({
   secure: env.nodeEnv === "production",
   sameSite: env.nodeEnv === "production" ? "none" : "lax",
   maxAge,
+  path: "/",
 });
+
+const clearCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: env.nodeEnv === "production",
+  sameSite: env.nodeEnv === "production" ? "none" : "lax",
+  path: "/",
+};
 
 const ACCESS_TOKEN_AGE = 15 * 60 * 1000;
 const REFRESH_TOKEN_AGE = (isRememberMe: boolean) =>
@@ -53,14 +61,17 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const refreshToken = asyncHandler(async (req, res) => {
-  const result = await authService.refresh(req.body.refreshToken);
+  const result = await authService.refresh(
+    req.body.refreshToken ?? req.cookies?.refreshToken,
+  );
+  res.cookie("accessToken", result.accessToken, cookieOptions(ACCESS_TOKEN_AGE));
   return ApiResponse.ok(res, "Token refreshed successfully", result);
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  await authService.logout(req.body.refreshToken);
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  await authService.logout(req.body.refreshToken ?? req.cookies?.refreshToken);
+  res.clearCookie("accessToken", clearCookieOptions);
+  res.clearCookie("refreshToken", clearCookieOptions);
   return ApiResponse.ok(res, "User logged out successfully");
 });
 

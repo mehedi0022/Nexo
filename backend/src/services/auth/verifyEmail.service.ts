@@ -3,6 +3,7 @@ import { redis } from "../../config/redis.js";
 import { AppError } from "../../utils/appError.js";
 import { compareOTP } from "../../utils/hashOTP.js";
 import { publicUser } from "./common.js";
+import { hashToken } from "./common.js";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt.js";
 
 export interface VerifyEmailInput {
@@ -66,7 +67,7 @@ export const verifyEmail = async (input: VerifyEmailInput) => {
   await db.refreshToken.create({
     data: {
       userId: user.id,
-      token: refreshToken,
+      token: hashToken(refreshToken),
       expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL * 1000),
     },
   });
